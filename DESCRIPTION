@@ -17,7 +17,6 @@ Imports:
     purrr,
     rlang,
     tidyr,
-    survival,
     gtsummary
 Remotes:
     TalhoukLab/biostatUtil
