@@ -3,7 +3,6 @@
 #' @importFrom dplyr filter select distinct mutate %>% any_of all_of
 #' @importFrom tidyr drop_na
 #' @importFrom purrr map
-#' @importFrom survival Surv coxph
 #' @importFrom gtsummary tbl_uvregression tbl_strata bold_p bold_labels style_pvalue
 #' @importFrom rlang expr sym parse_expr :=
 #' @importFrom utils globalVariables
@@ -86,69 +85,3 @@ plot_km_curves <- function(args, caps) {
     wrap_ggkm(title = caps, tag_levels = "A")
   print(p)
 }
-
-#' Generate a Uni variate Cox Regression Table
-#'
-#' @param data A data frame containing survival and covariate variables.
-#' @param outcome_prefix A string like "os", "dss", or "pfs".
-#' @param covariates Character vector of covariate column names.
-#' @param filter_expr Optional filtering expression (e.g., mmr_loss_type_2 == "MLH1 or PMS2/MLH1 loss").
-#'
-#' @return A gtsummary table object.
-#' @export
-cox_uv_regression <- function(data, outcome_prefix, covariates, filter_expr = NULL) {
-  time_var <- paste0(outcome_prefix, "_yrs5")
-  status_var <- paste0(outcome_prefix, "_sts5")
-  event_label <- paste0(outcome_prefix, ".event")
-
-  df <- if (!is.null(filter_expr)) {
-    data %>% filter(!!rlang::parse_expr(filter_expr))
-  } else {
-    data
-  }
-
-  tbl_uvregression(
-    data = df,
-    method = coxph,
-    y = c(time_var, status_var),
-    exponentiate = TRUE,
-    include = any_of(c(covariates)),
-    pvalue_fun = function(x) style_pvalue(x, digits = 2),
-    event = event_label
-  ) %>%
-    bold_labels() %>%
-    bold_p()
-}
-
-
-#' Generate Cox Regression Tables Grouped by a Variable
-#'
-#' @param data A data frame.
-#' @param outcome_prefix A string like "os", "dss", or "pfs".
-#' @param covariates Character vector of covariate column names.
-#' @param group_var Name of the grouping variable (e.g. "stage").
-#'
-#' @return A gtsummary stratified table object.
-#' @export
-cox_uv_regression_by_group <- function(data, outcome_prefix, covariates, group_var) {
-  time_var <- paste0(outcome_prefix, "_yrs5")
-  status_var <- paste0(outcome_prefix, "_sts5")
-  event_label <- paste0(outcome_prefix, ".event")
-
-  data %>%
-    drop_na(!!rlang::sym(group_var)) %>%
-    select(any_of(c(time_var, status_var, covariates, group_var))) %>%
-    tbl_strata(
-      strata = !!rlang::sym(group_var),
-      .tbl_fun = ~ tbl_uvregression(
-        data = .x,
-        method = coxph,
-        y = c(time_var, status_var),
-        exponentiate = TRUE,
-        pvalue_fun = function(x) style_pvalue(x, digits = 2),
-        event = event_label
-      ),
-      .header = "**{strata}**, N = {n}"
-    )
-}
-
