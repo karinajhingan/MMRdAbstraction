@@ -1,0 +1,27 @@
+Package: MMRdAbstraction
+Type: Package
+Title: Bc-1495 MMRd Abstraction
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Karina", "Jhingan",
+      email = "kjhingan@bccrc.ca",
+      role = c("aut", "cre")
+    )
+  )
+Description: This package include abstractions for the bc1-495 and bc-1511 Rmd file reports.
+Imports:
+    biostatUtil,
+    ggplot2,
+    dplyr,
+    purrr,
+    rlang,
+    tidyr,
+    survival,
+    gtsummary
+Remotes:
+    TalhoukLab/biostatUtil
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
