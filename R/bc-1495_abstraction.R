@@ -110,14 +110,16 @@ cox_uv_regression <- function(data, outcome_prefix, covariates, filter_expr = NU
   tbl_uvregression(
     data = df,
     method = coxph,
-    y = Surv(df[[time_var]], df[[status_var]] == event_label),
+    y = c(time_var, status_var),
     exponentiate = TRUE,
-    include = any_of(c(time_var, status_var, covariates)),
-    pvalue_fun = function(x) style_pvalue(x, digits = 2)
-  ) |>
-    bold_labels() |>
+    include = any_of(c(covariates)),
+    pvalue_fun = function(x) style_pvalue(x, digits = 2),
+    event = event_label
+  ) %>%
+    bold_labels() %>%
     bold_p()
 }
+
 
 #' Generate Cox Regression Tables Grouped by a Variable
 #'
@@ -141,10 +143,12 @@ cox_uv_regression_by_group <- function(data, outcome_prefix, covariates, group_v
       .tbl_fun = ~ tbl_uvregression(
         data = .x,
         method = coxph,
-        y = Surv(.x[[time_var]], .x[[status_var]] == event_label),
+        y = c(time_var, status_var),
         exponentiate = TRUE,
-        pvalue_fun = function(x) style_pvalue(x, digits = 2)
+        pvalue_fun = function(x) style_pvalue(x, digits = 2),
+        event = event_label
       ),
       .header = "**{strata}**, N = {n}"
     )
 }
+
