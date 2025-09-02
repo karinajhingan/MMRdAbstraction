@@ -80,7 +80,7 @@ tag_multi_loss <- function(data, markers, loss_levels, tag_name) {
 #'
 #' @return A printed ggplot object with KM curves.
 #' @export
-km_curves <- function(args, caps) {
+plot_km_curves <- function(args, caps) {
   p <- km_args_list %>%
     map(~ exec("doKMPlots", !!!c(.x, args))) %>%
     wrap_ggkm(title = caps, tag_levels = "A")
